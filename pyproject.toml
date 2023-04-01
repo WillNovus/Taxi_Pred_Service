@@ -6,7 +6,21 @@ authors = ["willnovus <gabrielwill666@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.9.7 || >3.9.7,<3.10"
+jupyter = "^1.0.0"
+pandas = "^1.5.3"
+pyarrow = "^11.0.0"
+plotly = "^5.13.1"
+tqdm = "^4.65.0"
+scikit-learn = "^1.2.2"
+xgboost = "^1.7.4"
+lightgbm = "^3.3.5"
+optuna = "^3.1.0"
+python-dotenv = "^1.0.0"
+streamlit = "^1.20.0"
+geopandas = "^0.12.2"
+pydeck = "^0.8.0"
+hopsworks = "^3.0.5"
 
 
 [build-system]
