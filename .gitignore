@@ -3,3 +3,4 @@ taxi_demand_predictor.pyproj
 .vs
 data
 .venv
+model

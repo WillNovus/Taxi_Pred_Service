@@ -21,6 +21,7 @@ streamlit = "^1.20.0"
 geopandas = "^0.12.2"
 pydeck = "^0.8.0"
 hopsworks = "^3.0.5"
+requests = "^2.28.2"
 
 
 [build-system]
