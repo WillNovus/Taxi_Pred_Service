@@ -1,6 +1,10 @@
 .env
 taxi_demand_predictor.pyproj
 .vs
-data
+data/
 .venv
 model
+**/__pycache__
+*.parquet
+*.shp
+*.pkl
