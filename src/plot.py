@@ -11,7 +11,10 @@ def plot_one_sample(
 ):
     """"""""
     features_ = features.iloc[example_id]
-    target_ = targets.iloc[example_id]
+    if targets is not None:
+        target_ = targets.iloc[example_id]
+    else:
+        target_ = None
 
     ts_columns = [c for c in features.columns if c.startswith('rides_previous_')]
     ts_values = [features_[c] for c in ts_columns] + [target_]
@@ -51,7 +54,7 @@ def plot_ts(
     """
     Plot time-series data
     """
-    ts_data_to_plot = ts_data[ts_data.pickup_location_id.isin(locations)] if locations else rides
+    ts_data_to_plot = ts_data[ts_data.pickup_location_id.isin(locations)] if locations else ts_data
 
     fig = px.line(
         ts_data_to_plot,
