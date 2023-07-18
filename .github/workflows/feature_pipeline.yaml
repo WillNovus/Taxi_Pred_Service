@@ -30,3 +30,4 @@ jobs:
        env:
          HOPSWORKS_API_KEY: ${{ secrets.HOPWORKS_API_KEY }}
        run: poetry run jupyter nbconvert --to notebook --execute notebooks/12_feature_pipeline.ipynb
+       
