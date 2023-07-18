@@ -58,7 +58,7 @@ def load_shape_data_file() -> gpd.geodataframe.GeoDataFrame:
     return gpd.read_file(DATA_DIR / 'taxi_zones/taxi_zones.shp').to_crs('epsg:4326')
 
 
-@st.experimental_memo
+@st.cache_data
 def _load_batch_of_features_from_store(current_date: datetime) -> pd.DataFrame:
     """Wrapped version of src.inference.load_batch_of_features_from_store, so
     we can add Streamlit caching
@@ -77,7 +77,7 @@ def _load_batch_of_features_from_store(current_date: datetime) -> pd.DataFrame:
     """
     return load_batch_of_features_from_store(current_date)
 
-@st.experimental_memo
+@st.cache_data
 def _load_predictions_from_store(
     from_pickup_hour: datetime,
     to_pickup_hour: datetime
