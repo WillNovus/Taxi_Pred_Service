@@ -97,7 +97,7 @@ def load_batch_of_features_from_store(
 
 def load_model_from_registry():
     
-    import joblib
+    import  joblib 
     from pathlib import Path
 
     project = get_hopsworks_project()
