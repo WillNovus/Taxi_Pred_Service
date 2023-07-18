@@ -8,7 +8,7 @@ load_dotenv(PARENT_DIR/'.env')
 HOPSWORKS_PROJECT_NAME = 'taxi_batch_scoring' 
 
 try:
-    HOPSWORKS_API_KEY = os.environ['HOPSWORK_API_KEY']
+    HOPSWORKS_API_KEY = os.environ['HOPSWORKS_API_KEY']
 except:
     raise Exception("Create an .env file on the project root with the HOPSWORKS_API_KEY")
 

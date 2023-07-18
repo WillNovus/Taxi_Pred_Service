@@ -173,3 +173,4 @@ def load_predictions_from_store(
     predictions.sort_values(by=['pickup_hour', 'pickup_location_id'], inplace=True)
 
     return predictions
+
