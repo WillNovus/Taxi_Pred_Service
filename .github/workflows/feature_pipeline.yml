@@ -1,4 +1,4 @@
-name: hourly-taxi-demand-feature-pipeline-with-cache
+name: feature-pipeline
 
 on:
   schedule:
@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: 3.9
-  POETRY_VERSION: 1.1.7
+  POETRY_VERSION: 1.4.2
   POETRY_URL: https://install.python-poetry.org
 
 jobs:
