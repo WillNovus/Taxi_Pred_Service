@@ -34,7 +34,7 @@ def inference(
 
     logger.info('Saving predictions to the feature store')
     feature_group = get_feature_store().get_or_create_feature_group(
-        name=config.FEATURE_GROUP_MODEL_PREDICTIONS,
+        name=config.FEATURE_GROUP_PREDICTIONS_METADATA.name,
         version=1,
         description="Predictions generate by our production model",
         primary_key = ['pickup_location_id', 'pickup_hour'],

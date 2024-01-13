@@ -40,8 +40,8 @@ def run(date: datetime):
 
     logger.info('Getting pointer to the feature group we wanna save data to')
     # get a pointer to the feature group we wanna write to
-    feature_group = get_feature_group(name=config.FEATURE_GROUP_NAME,
-                                      version=config.FEATURE_GROUP_VERSION)
+    feature_group = get_feature_group(name=config.FEATURE_GROUP_METADATA.name,
+                                      version=config.FEATURE_GROUP_METADATA.version)
     
     logger.info('Start job to insert data into feature group')
     # start a job to insert the data into the feature group
