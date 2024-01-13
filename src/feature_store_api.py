@@ -53,8 +53,8 @@ def get_feature_group(
         hsfs.feature_group.FeatureGroup: pointer to the feature group
     """
     return get_feature_store().get_feature_group(
-        name=name,
-        version=version,
+        name=config.FEATURE_GROUP_METADATA.name,
+        version=config.FEATURE_GROUP_METADATA.version,
     )
 
 def get_or_create_feature_group(
@@ -71,12 +71,12 @@ def get_or_create_feature_group(
         hsfs.feature_group.FeatureGroup: pointer to the feature group
     """
     return get_feature_store().get_or_create_feature_group(
-        name=feature_group_metadata.name,
-        version=feature_group_metadata.version,
-        description=feature_group_metadata.description,
-        primary_key=feature_group_metadata.primary_key,
-        event_time=feature_group_metadata.event_time,
-        online_enabled=feature_group_metadata.online_enabled
+        name=config.FEATURE_GROUP_METADATA.name,
+        version=config.FEATURE_GROUP_METADATA.version,
+        description=config.FEATURE_GROUP_METADATA.description,
+        primary_key=config.FEATURE_GROUP_METADATA.primary_key,
+        event_time=config.FEATURE_GROUP_METADATA.event_time,
+        online_enabled=config.FEATURE_GROUP_METADATA.online_enabled
     )
 
 def get_or_create_feature_view(
@@ -90,15 +90,15 @@ def get_or_create_feature_view(
     # get pointer to the feature group
     # from src.config import FEATURE_GROUP_METADATA
     feature_group = feature_store.get_feature_group(
-        name=feature_view_metadata.feature_group.name,
-        version=feature_view_metadata.feature_group.version
+        name=config.FEATURE_VIEW_METADATA.feature_group.name,
+        version=config.FEATURE_VIEW_METADATA.feature_group.version
     )
 
     # create feature view if it doesn't exist
     try:
         feature_store.create_feature_view(
-            name=feature_view_metadata.name,
-            version=feature_view_metadata.version,
+            name=config.FEATURE_VIEW_METADATA.name,
+            version=config.FEATURE_VIEW_METADATA.version,
             query=feature_group.select_all()
         )
     except:
@@ -107,8 +107,8 @@ def get_or_create_feature_view(
     # get feature view
     feature_store = get_feature_store()
     feature_view = feature_store.get_feature_view(
-        name=feature_view_metadata.name,
-        version=feature_view_metadata.version,
+        name=config.FEATURE_VIEW_METADATA.name,
+        version=config.FEATURE_VIEW_METADATA.version,
     )
 
     return feature_view

@@ -1,7 +1,10 @@
+import os
 from datetime import date, timedelta
 from typing import Tuple, Optional
+from pathlib import Path
 
-import hsfs
+from comet_ml import Experiment
+from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import TimeSeriesSplit
@@ -11,64 +14,42 @@ import optuna
 
 from src.data import transform_ts_data_into_features_and_target
 from src import config
+from src.paths import PARENT_DIR, DATA_CACHE_DIR
+from src.config import FEATURE_VIEW_METADATA, N_HYPERPARAMETER_SEARCH_TRIALS
 from src.data_split import train_test_split
-from src.feature_store_api import get_feature_store
+from src.feature_store_api import get_or_create_feature_view
 from src.model_registry_api import push_model_to_registry
-from src.model import get_pipeline                                                                  
+from src.model import get_pipeline
+from src.discord import send_message_to_channel                                                                  
 from src.logger import get_logger
 #from src.discord import send_message_to_channel
 
 logger = get_logger()
 
-def get_pointer_to_feature_view() -> hsfs.feature_view.FeatureView:
-    """Returns a pointer to the feature view"""
-    
-    # pointer to feature store
-    feature_store = get_feature_store()
+#load variables from .env file as environment variables.
+load_dotenv(PARENT_DIR/'.env')
 
-    # pointer to feature group
-    feature_group = feature_store.get_feature_group(
-        name=config.FEATURE_GROUP_NAME,
-        version=config.FEATURE_GROUP_VERSION
-    )
-
-    try:
-        # create feature view if it doesn't exist yet
-        feature_store.create_feature_view(
-            name=config.FEATURE_VIEW_NAME,
-            version=config.FEATURE_VIEW_VERSION,
-            query=feature_group.select_all()
-        )
-    except:
-        print('Feature view already existed. Skip creation.')
-
-
-    # get pointer to the feature view
-    feature_view = feature_store.get_feature_view(
-        name=config.FEATURE_VIEW_NAME,
-        version=config.FEATURE_VIEW_VERSION
-    )
-
-    # and finally return it
-    return feature_view
-
-def get_features_and_targets(
-    from_date: str,
-    to_date: str,
+def fetch_features_and_targets_from_store(
+    from_date: pd.Timestamp,
+    to_date: pd.Timestamp,
     step_size: int,
 ) -> pd.DataFrame:
     """
     Fetches time-series data from the store, transforms it into features and
     targets and returns it as a pandas DataFrame.
     """
-    feature_view = get_pointer_to_feature_view()
+
+    #get pointer to feature view
+    logger.info('Getting pointer to feature view...')
+    feature_view = get_or_create_feature_view(FEATURE_VIEW_METADATA)
 
     # generate training data from the feature view
     ts_data, _ = feature_view.training_data(
         description='Time-series hourly taxi rides',
-        start_time=from_date,
-        end_time=to_date,
     )
+    from_ts = int(from_date.timestamp())
+    to_ts = int(to_date.timestamp())
+    ts_data = ts_data[ts_data['pickup_ts'].between(from_ts, to_ts)]
 
     # sort by pickup_location_id and pickup_hour in ascending order
     ts_data.sort_values(by=['pickup_location_id', 'pickup_hour'], inplace=True)
@@ -154,37 +135,72 @@ def find_best_hyperparameters(
 
     return best_params
 
+def load_features_and_targets(
+        local_path_features_and_target: Optional[Path] = None,
+    ) -> pd.DataFrame:
 
-def train() -> None:
+        if local_path_features_and_target:
+            logger.info('Loading features_and_target from local file')
+            features_and_target = pd.read_parquet(local_path_features_and_target)
+        else:
+            logger.info('Fetching features and targets from the feature store.')
+            from_date = pd.to_datetime(date.today() - timedelta(days=52*7))
+            to_date = pd.to_datetime(date.today())
+            features_and_target = fetch_features_and_targets_from_store(from_date, to_date, step_size = 23)
+
+            try:
+                local_file = DATA_CACHE_DIR / 'features_and_target.parquet'
+                features_and_target.to_parquet(local_file)
+                logger.info(f'Saved features_and_target to local file at {local_file}')
+            except:
+                logger.info('Could not save features_and_target to local file')
+                pass
+        return features_and_target 
+
+def train(local_path_features_and_target: Optional[Path]= None) -> None:
     """
     Trains model and pushes it to the model registry if it meets the minimum
     performance threshold.
     """
-    logger.info('Training model...')
+    logger.info(' Start model training...')
 
-    # get features and targets from the feature store
-    logger.info('Getting features and targets from the feature store...')
-    from_date = str(date.today() - timedelta(days=26*7)) # half a year of data
-    to_date = str(date.today())
-    features_and_target = get_features_and_targets(from_date,to_date, step_size=23)
+    # Start Comet ML experiment run
+    logger.info('Creating Comet ML experiment')
+    experiment = Experiment(
+        api_key = os.environ["COMET_ML_API_KEY"],
+        workspace = os.environ["COMET_ML_WORKSPACE"],
+        project_name = os.environ["COMET_ML_PROJECT_NAME"]
+    )
+
+    # load features and targets
+    features_and_target = load_features_and_targets(local_path_features_and_target)
+    experiment.log_dataset_hash(features_and_target)
 
     # split the data into training and validation sets
+    cutoff_date = pd.to_datetime(date.today() - timedelta(days=28), utc=True)
     logger.info('Splitting data into training and test sets...')
     X_train, y_train, X_test, y_test = split_data(
         features_and_target,
-        cutoff_date=pd.to_datetime(date.today() - timedelta(days=28))
+        cutoff_date=cutoff_date
     )
+
+    experiment.log_parameters({
+        'X_train_shape': X_train.shape,
+        'y_train_shape': y_train.shape,
+        'X_test_shape': X_test.shape,
+        'y_test_shape': y_test.shape,
+    })
 
     # find the best hyperparameters using time-based cross-validation
     logger.info('Finding best hyperparameters...')
-    best_hyperparameters = find_best_hyperparameters(X_train, y_train, n_trials=1)
+    best_hyperparameters = find_best_hyperparameters(X_train, y_train, n_trials=N_HYPERPARAMETER_SEARCH_TRIALS)
 
     # train the model using the best hyperparameters
     logger.info('Training model using the best hyperparameters...')
     pipeline = get_pipeline(**best_hyperparameters)
     pipeline.fit(X_train, y_train)
 
-    # evalute the model on test data
+    #evaluate the model on test data
     predictions = pipeline.predict(X_test)
     test_mae = mean_absolute_error(y_test, predictions)
     logger.info(f'{test_mae=:.4f}')
@@ -206,4 +222,6 @@ def train() -> None:
 
 if __name__ == '__main__':
 
-    train()
+    from fire import Fire
+
+    Fire(train)

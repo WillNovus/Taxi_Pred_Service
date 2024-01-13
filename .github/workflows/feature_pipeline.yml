@@ -2,13 +2,13 @@ name: feature-pipeline
 
 on:
   schedule:
-   - cron: '0 * * * *'
+  - cron: '0 * * * *'
 
   workflow_dispatch:
 
 env:
   PYTHON_VERSION: 3.9
-  POETRY_VERSION: 1.4.2
+  POETRY_VERSION: 1.6.1
   POETRY_URL: https://install.python-poetry.org
 
 jobs:
@@ -49,6 +49,7 @@ jobs:
         
     - name: execute python workflows from bash script
       env: 
+        HOPSWORKS_PROJECT_NAME: ${{ secrets.HOPSWORKS_PROJECT_NAME }}
         HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
       run: make features
       #poetry run jupyter nbconvert --to notebook --execute notebooks/12_feature_pipeline.ipynb  

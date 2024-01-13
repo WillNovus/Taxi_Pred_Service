@@ -1,23 +1,23 @@
 name: inference-pipeline
 
 on:
-  workflow_run:
-    workflows: ["feature-pipeline"]
-    types:
-      - completed
-
+  #workflow_run:
+    #workflows: ["feature-pipeline"]
+    #types:
+      #- completed
+  schedule:
+    - cron: '30 * * * *'
   workflow_dispatch:
 
 env:
   PYTHON_VERSION: 3.9
-  POETRY_VERSION: 1.4.2
+  POETRY_VERSION: 1.6.1
   POETRY_URL: https://install.python-poetry.org
 
 jobs:
 
   inference_pipeline:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -53,5 +53,9 @@ jobs:
     - name: Generating new batch of predictions
       env: 
         HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        HOPSWORKS_PROJECT_NAME: ${{ secrets.HOPSWORKS_PROJECT_NAME }}
+        COMET_ML_API_KEY: ${{ secrets.COMET_ML_API_KEY }}
+        COMET_ML_WORKSPACE: ${{ secrets.COMET_ML_WORKSPACE }}
+        COMET_ML_PROJECT_NAME: ${{ secrets.COMET_ML_PROJECT_NAME }}
       run: make inference
   
