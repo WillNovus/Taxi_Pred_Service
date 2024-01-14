@@ -45,7 +45,9 @@ jobs:
         echo "$HOME/.local/bin" >> $GITHUB_PATH
     
     - name: Install Dependencies
-      run: poetry install
+      run: | 
+        poetry install
+        pip install hopsworks
 
     - name: Debug
       run: |
