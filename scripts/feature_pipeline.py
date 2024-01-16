@@ -47,7 +47,7 @@ def run(date: datetime):
     # start a job to insert the data into the feature group
     # we wait, to make sure the job is finished before we exit the script, and
     # the inference pipeline can start using the new data
-    feature_group.insert(ts_data, write_options={"wait_for_job": True})
+    feature_group.insert(ts_data, write_options={"wait_for_job": False})
     logger.info('Finished job to insert data into feature group')
 
 if __name__ == '__main__':
