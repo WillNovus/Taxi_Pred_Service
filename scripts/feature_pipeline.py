@@ -9,7 +9,7 @@ from src.data import (
     fetch_ride_events_from_data_warehouse,
     transform_raw_data_into_ts_data,
 )
-from src.feature_store_api import get_feature_group
+from src.feature_store_api import get_or_create_feature_group
 from src.logger import get_logger
 
 logger = get_logger()
@@ -40,8 +40,7 @@ def run(date: datetime):
 
     logger.info('Getting pointer to the feature group we wanna save data to')
     # get a pointer to the feature group we wanna write to
-    feature_group = get_feature_group(name=config.FEATURE_GROUP_METADATA.name,
-                                      version=config.FEATURE_GROUP_METADATA.version)
+    feature_group = get_or_create_feature_group(config.FEATURE_GROUP_METADATA)
     
     logger.info('Start job to insert data into feature group')
     # start a job to insert the data into the feature group
