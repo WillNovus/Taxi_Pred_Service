@@ -2,7 +2,7 @@ name: feature-pipeline
 
 on:
   schedule:
-  - cron: '0 * * * *'
+  - cron: '*/30 * * * *'
 
   workflow_dispatch:
 
@@ -47,7 +47,6 @@ jobs:
     - name: Install Dependencies
       run: | 
         poetry install
-
         
     - name: execute python workflows from bash script
       env: 

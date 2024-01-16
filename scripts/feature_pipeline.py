@@ -24,7 +24,7 @@ def run(date: datetime):
         _type_: _description_
     """
     logger.info('Fetching raw data from data warehouse')
-    # fetch raw ride events from the datawarehouse for the last 28 days
+    # fetch raw ride events from the data warehouse for the last 28 days
     # we fetch the last 28 days, instead of the last hour only, to add redundancy
     # to the feature_pipeline. This way, if the pipeline fails for some reason,
     # we can still re-write data for that missing hour in a later run.
@@ -37,6 +37,11 @@ def run(date: datetime):
     # transform raw data into time-series data by aggregating rides per
     # pickup location and hour
     ts_data = transform_raw_data_into_ts_data(rides)
+
+    logger.info('Adding column `pickup_ts` with Unix milliseconds.')
+    # convert string to datetime and add column with Unix epoch milliseconds
+    ts_data['pickup_hour'] = pd.to_datetime(ts_data['pickup_hour'], utc=True)
+    ts_data['pickup_ts'] = ts_data['pickup_hour'].astype(int) // 10**6
 
     logger.info('Getting pointer to the feature group we wanna save data to')
     # get a pointer to the feature group we wanna write to
