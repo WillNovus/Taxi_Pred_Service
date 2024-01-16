@@ -196,6 +196,10 @@ def transform_ts_data_into_features_and_target(
     Slices and transposes data from time-series format into a (features, target) format
     that we can use to train Supervised ML models.
     """
+    # convert string to datetime and add column with Unix epoch milliseconds
+    ts_data['pickup_hour'] = pd.to_datetime(ts_data['pickup_hour'], utc=True)
+    ts_data['pickup_ts'] = ts_data['pickup_hour'].astype(int) // 10**6
+
     assert set(ts_data.columns) == {'pickup_hour', 'rides', 'pickup_location_id', 'pickup_ts'}
 
     location_ids = ts_data['pickup_location_id'].unique()
