@@ -48,12 +48,6 @@ jobs:
       run: | 
         poetry install
 
-
-    - name: Debug
-      run: |
-        pwd
-        ls -al
-        echo "PATH: $PATH"
         
     - name: execute python workflows from bash script
       env: 
