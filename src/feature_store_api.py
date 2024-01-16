@@ -34,7 +34,7 @@ def get_feature_store() -> hsfs.feature_store.FeatureStore:
     """
     project = hopsworks.login(
         project=config.HOPSWORKS_PROJECT_NAME,
-        api_key_value=config.HOPSWORKS_API_KEY
+        api_key_value=config.HOPSWORKS_API_KEY,
     )
     return project.get_feature_store()
 
