@@ -19,8 +19,7 @@ from src.config import FEATURE_VIEW_METADATA, N_HYPERPARAMETER_SEARCH_TRIALS
 from src.data_split import train_test_split
 from src.feature_store_api import get_or_create_feature_view
 from src.model_registry_api import push_model_to_registry
-from src.model import get_pipeline
-from src.discord import send_message_to_channel                                                                  
+from src.model import get_pipeline                                                                 
 from src.logger import get_logger
 #from src.discord import send_message_to_channel
 
@@ -215,7 +214,7 @@ def train(local_path_features_and_target: Optional[Path]= None) -> None:
             test_mae=test_mae,
             description="LightGBM regressor with a bit of hyper-parameter tuning",
         )
-        send_message_to_channel(f'New model pushed to the model registry. {test_mae=:.4f}, {model_version=}')
+        print(f'New model pushed to the model registry. {test_mae=:.4f}, {model_version=}')
 
     else:
         logger.info('Model did not meet the minimum performance threshold. Skip pushing to the model registry.')
