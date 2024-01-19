@@ -1,8 +1,11 @@
 name: training-pipeline
 
 on:
-  schedule:
-  - cron: '30 * * * *'
+  #schedule:
+  #- cron: '30 * * * *'
+  push:
+      branches:
+          - main
   
   workflow_dispatch:
 
