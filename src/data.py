@@ -197,7 +197,7 @@ def transform_ts_data_into_features_and_target(
     that we can use to train Supervised ML models.
     """
 
-    assert set(ts_data.columns) == {'pickup_hour', 'rides', 'pickup_location_id', 'pickup_ts'}
+    assert set(ts_data.columns) == {'pickup_hour', 'rides', 'pickup_location_id'}
 
     location_ids = ts_data['pickup_location_id'].unique()
     features = pd.DataFrame()
@@ -225,7 +225,7 @@ def transform_ts_data_into_features_and_target(
 
         for i, idx in enumerate(indices):
             x[i, :] = ts_data_one_location.iloc[idx[0]:idx[1]]['rides'].values
-            y[i] = ts_data_one_location.iloc[idx[1]:idx[2]]['rides'].values
+            y[i] = ts_data_one_location.iloc[idx[1]:idx[2]]['rides'].values[0]
             pickup_hours.append(ts_data_one_location.iloc[idx[1]]['pickup_hour'])
 
         #numpy -> pandas
