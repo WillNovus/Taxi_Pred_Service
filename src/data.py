@@ -236,7 +236,7 @@ def transform_ts_data_into_features_and_target(
         features_one_location['pickup_hour'] = pickup_hours
         features_one_location['pickup_location_id'] = location_id
 
-        targets_one_location = pd.DataFrame(y, columns=[f'target_rides_in_the_next_hour'])
+        targets_one_location = pd.DataFrame(y, columns=[f'target_rides_next_hour'])
 
         #concatenate results
         features = pd.concat([features, features_one_location])
@@ -245,7 +245,7 @@ def transform_ts_data_into_features_and_target(
     features.reset_index(inplace=True, drop=True)
     targets.reset_index(inplace=True, drop=True)
 
-    return features, targets['target_rides_in_the_next_hour']
+    return features, targets['target_rides_next_hour']
 
 
 def get_cutoff_indices_features_and_target(
