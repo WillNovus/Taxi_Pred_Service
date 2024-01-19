@@ -225,7 +225,7 @@ def transform_ts_data_into_features_and_target(
 
         for i, idx in enumerate(indices):
             x[i, :] = ts_data_one_location.iloc[idx[0]:idx[1]]['rides'].values
-            y[i] = ts_data_one_location.iloc[idx[1]:idx[2]]['rides'].values[0]
+            y[i] = ts_data_one_location.iloc[idx[1]:idx[2]]['rides'].values
             pickup_hours.append(ts_data_one_location.iloc[idx[1]]['pickup_hour'])
 
         #numpy -> pandas
