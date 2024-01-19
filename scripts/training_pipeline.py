@@ -56,6 +56,8 @@ def fetch_features_and_targets_from_store(
     # drop `pickup_ts` column
     ts_data.drop('pickup_ts', axis=1, inplace=True)
 
+    print(ts_data)
+
     # transform time-series data from the feature store into features and targets
     # for supervised learning
     features, targets = transform_ts_data_into_features_and_target(

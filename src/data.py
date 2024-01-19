@@ -236,6 +236,7 @@ def transform_ts_data_into_features_and_target(
         features_one_location['pickup_hour'] = pickup_hours
         features_one_location['pickup_location_id'] = location_id
 
+        #numpy -> pandas
         targets_one_location = pd.DataFrame(y, columns=[f'target_rides_next_hour'])
 
         #concatenate results
@@ -244,6 +245,8 @@ def transform_ts_data_into_features_and_target(
 
     features.reset_index(inplace=True, drop=True)
     targets.reset_index(inplace=True, drop=True)
+
+    print(targets)
 
     return features, targets['target_rides_next_hour']
 
