@@ -25,7 +25,7 @@ FEATURE_GROUP_METADATA = FeatureGroupConfig(
 
 FEATURE_VIEW_METADATA = FeatureViewConfig(
     name='time_series_hourly_feature_view', 
-    version=1,
+    version=2,
     feature_group = FEATURE_GROUP_METADATA,
 )
 
