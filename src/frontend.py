@@ -22,6 +22,7 @@ st.set_page_config(layout="wide")
 # title
 #current_date = datetime.strptime('2023-01-05 12:00:00', '%Y-%m-%d %H:%M:%S')
 current_date = pd.to_datetime(datetime.utcnow()).floor('H')
+_current_date = current_date - timedelta(days=365)
 st.title(f'Taxi demand prediction 🚕')
 st.header(f'{current_date} UTC')
 
@@ -59,7 +60,7 @@ def load_shape_data_file() -> gpd.geodataframe.GeoDataFrame:
 
 
 @st.cache_data
-def _load_batch_of_features_from_store(current_date: datetime) -> pd.DataFrame:
+def _load_batch_of_features_from_store(_current_date: datetime) -> pd.DataFrame:
     """Wrapped version of src.inference.load_batch_of_features_from_store, so
     we can add Streamlit caching
 
@@ -75,7 +76,7 @@ def _load_batch_of_features_from_store(current_date: datetime) -> pd.DataFrame:
             - `pickup_hour`
             - `pickup_location_id`
     """
-    return load_batch_of_features_from_store(current_date)
+    return load_batch_of_features_from_store(_current_date)
 
 @st.cache_data
 def _load_predictions_from_store(
@@ -105,8 +106,8 @@ with st.spinner(text="Downloading shape file to plot taxi zones"):
 
 with st.spinner(text="Fetching model predictions from the store"):
     predictions_df = _load_predictions_from_store(
-        from_pickup_hour=current_date - timedelta(hours=1),
-        to_pickup_hour=current_date
+        from_pickup_hour=_current_date - timedelta(hours=1),
+        to_pickup_hour=_current_date
         )
     st.sidebar.write('✅ Model predictions arrived')
     progress_bar.progress(2/N_STEPS)
@@ -114,19 +115,20 @@ with st.spinner(text="Fetching model predictions from the store"):
 # Here we are checking the predictions for the current hour have already been computed
 # and are available
 next_hour_predictions_ready = \
-    False if predictions_df[predictions_df.pickup_hour == current_date].empty else True
+    False if predictions_df[predictions_df.pickup_hour == _current_date].empty else True
 prev_hour_predictions_ready = \
-    False if predictions_df[predictions_df.pickup_hour == (current_date - timedelta(hours=1))].empty else True
+    False if predictions_df[predictions_df.pickup_hour == (_current_date - timedelta(hours=1))].empty else True
 
 if next_hour_predictions_ready:
     # predictions for the current hour are available
-    predictions_df = predictions_df[predictions_df.pickup_hour == current_date]
+    predictions_df = predictions_df[predictions_df.pickup_hour == _current_date]
 elif prev_hour_predictions_ready:
     # predictions for current hour are not available, so we use previous hour predictions
-    predictions_df = predictions_df[predictions_df.pickup_hour == (current_date - timedelta(hours=1))]
-    current_date = current_date - timedelta(hours=1)
+    predictions_df = predictions_df[predictions_df.pickup_hour == (_current_date - timedelta(hours=1))]
+    _current_date = _current_date - timedelta(hours=1)
     st.subheader('⚠️ The most recent data is not yet available. Using last hour predictions')
 else:
+    print(_current_date)
     raise Exception('Features are not available for the last 2 hours. Is your feature \
                     pipeline up and running? 🤔')
 

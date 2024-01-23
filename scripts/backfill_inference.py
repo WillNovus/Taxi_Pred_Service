@@ -11,8 +11,9 @@ from src.inference import (
 from src.feature_store_api import get_feature_store
 import src.config as config
 
+
 def run(current_date: pd.Timestamp) -> None:
-    """Runs inference onthe given `current_date`
+    """Runs inference on the given `current_date`
     This function is useful to backfill past inference runs.
 
     Args:
@@ -34,12 +35,13 @@ def run(current_date: pd.Timestamp) -> None:
     # for downstream tasks, like monitoring
     # get a pointer to the feature group
     feature_group = get_feature_store().get_or_create_feature_group(
-        name=config.FEATURE_GROUP_MODEL_PREDICTIONS,
-        version=1,
-        description="Predictions generate by our production model",
-        primary_key = ['pickup_location_id', 'pickup_hour'],
-        event_time='pickup_hour',
+    name=config.FEATURE_GROUP_PREDICTIONS_METADATA.name,
+    version=1,
+    description="Predictions generate by our production model",
+    primary_key = ['pickup_location_id', 'pickup_hour'],
+    event_time='pickup_hour',
     )
+
     # save data to the feature group
     feature_group.insert(predictions, write_options={"wait_for_job": False})
 

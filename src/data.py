@@ -197,7 +197,7 @@ def transform_ts_data_into_features_and_target(
     that we can use to train Supervised ML models.
     """
 
-    assert set(ts_data.columns) == {'pickup_hour', 'rides', 'pickup_location_id'}
+    assert set(ts_data.columns) == {'pickup_hour', 'rides', 'pickup_location_id', 'pickup_ts'}
 
     location_ids = ts_data['pickup_location_id'].unique()
     features = pd.DataFrame()

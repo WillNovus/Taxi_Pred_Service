@@ -1,5 +1,5 @@
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 import fire
@@ -17,7 +17,7 @@ from src.logger import get_logger
 logger = get_logger()
 
 def inference(
-    current_date: Optional[pd.Timestamp] = pd.to_datetime(datetime.utcnow()).floor('H'),
+    current_date: Optional[pd.Timestamp] = pd.to_datetime(datetime.utcnow()).floor('H') - timedelta(days=365),
 ) -> None:
     """"""
     logger.info(f'Running inference pipeline for {current_date}')

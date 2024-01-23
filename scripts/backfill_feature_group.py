@@ -1,11 +1,8 @@
-import os
 from datetime import datetime
-
-from dotenv import load_dotenv
 import pandas as pd
 
 from src.data import load_raw_data, transform_raw_data_into_ts_data
-from src.config import FEATURE_GROUP_METADATA, HOPSWORKS_API_KEY, HOPSWORKS_PROJECT_NAME
+from src.config import FEATURE_GROUP_METADATA
 from src.feature_store_api import get_or_create_feature_group
 from src.logger import get_logger
 
