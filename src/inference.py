@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 
 import hopsworks
-from hsfs.feature_store import FeatureStore
+#from hsfs.feature_store import FeatureStore
 import pandas as pd
 import numpy as np
 
+from src.feature_store_api import get_or_create_feature_view
 import src.config as config
-from src.feature_store_api import get_feature_store, get_or_create_feature_view
 from src.config import FEATURE_VIEW_METADATA
 
 def get_hopsworks_project() -> hopsworks.project.Project:
@@ -15,12 +15,6 @@ def get_hopsworks_project() -> hopsworks.project.Project:
         project=config.HOPSWORKS_PROJECT_NAME,
         api_key_value=config.HOPSWORKS_API_KEY
     )
-
-# def get_feature_store() -> FeatureStore:
-    
-#     project = get_hopsworks_project()
-#     return project.get_feature_store()
-
 
 def get_model_predictions(model, features: pd.DataFrame) -> pd.DataFrame:
     """"""
@@ -124,7 +118,7 @@ def load_model_from_registry():
 
 def load_predictions_from_store(
         from_pickup_hour: datetime,
-        to_pickup_hour: datetime) -> pd.DataFrame:
+        to_pickup_hour: datetime)-> pd.DataFrame:
     """
     Connects to the feature store and retrieves model predictions for all
     `pickup_location_id`s and for the time period from `from_pickup_hour`
@@ -143,7 +137,8 @@ def load_predictions_from_store(
             - `predicted_demand`
             - `pickup_hour`
     """
-    import src.config as FEATURE_VIEW_PREDICTIONS_METADATA
+
+    from src.config import FEATURE_VIEW_PREDICTIONS_METADATA
     from src.feature_store_api import get_or_create_feature_view
 
     # get pointer to the feature view
