@@ -1,7 +1,23 @@
 import os
 from dotenv import load_dotenv
 from src.paths import PARENT_DIR
-from src.feature_store_api import FeatureGroupConfig, FeatureViewConfig
+from typing import Optional, List
+from dataclasses import dataclass
+
+@dataclass
+class FeatureGroupConfig:
+    name: str
+    version: int
+    description: str
+    primary_key: List[str]
+    event_time: str
+    online_enabled: Optional[bool] = False
+
+@dataclass
+class FeatureViewConfig:
+    name: str
+    version: int
+    feature_group: FeatureGroupConfig
 
 # load key-value pairs from .env file located in the parent directory
 load_dotenv(PARENT_DIR/'.env')
@@ -18,30 +34,30 @@ FEATURE_GROUP_METADATA = FeatureGroupConfig(
     name='time_series_hourly_feature_group',
     version=1,
     description='Feature group with hourly time-series data of historical taxi rides',
-    primary_key=['pickup_location_id', 'pickup_ts'],
-    event_time='pickup_ts',
+    primary_key=['pickup_location_id', 'pickup_hour'],
+    event_time='pickup_hour',
     online_enabled=True,
 )
 
 FEATURE_VIEW_METADATA = FeatureViewConfig(
     name='time_series_hourly_feature_view', 
-    version=2,
-    feature_group = FEATURE_GROUP_METADATA,
+    version=1,
+    feature_group=FEATURE_GROUP_METADATA
 )
 
 FEATURE_GROUP_PREDICTIONS_METADATA = FeatureGroupConfig(
     name='model_predictions_feature_group',
     version=1,
     description="Predictions generate by our production model",
-    primary_key = ['pickup_location_id', 'pickup_ts'],
-    event_time='pickup_ts',
+    primary_key = ['pickup_location_id', 'pickup_hour'],
+    event_time='pickup_hour',
 )
 
 # added for monitoring purposes
 FEATURE_VIEW_PREDICTIONS_METADATA =FeatureViewConfig(
     name='model_predictions_feature_view',
     version=1,
-    feature_group=FEATURE_GROUP_PREDICTIONS_METADATA,
+    feature_group=FEATURE_GROUP_PREDICTIONS_METADATA
 )
 
 MODEL_NAME = "taxi_demand_predictor_next_hour"
