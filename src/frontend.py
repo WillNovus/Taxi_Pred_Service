@@ -10,10 +10,8 @@ import streamlit as st
 import geopandas as gpd
 import pydeck as pdk
 
-from src.inference import (
-    load_predictions_from_store,
-    load_batch_of_features_from_store
-)
+from src.inference import load_predictions_from_store, load_batch_of_features_from_store
+
 from src.paths import DATA_DIR
 from src.plot import plot_one_sample
 
@@ -109,28 +107,28 @@ with st.spinner(text="Fetching model predictions from the store"):
         from_pickup_hour=_current_date - timedelta(hours=1),
         to_pickup_hour=_current_date
         )
+    print(predictions_df)
     st.sidebar.write('✅ Model predictions arrived')
     progress_bar.progress(2/N_STEPS)
 
 # Here we are checking the predictions for the current hour have already been computed
 # and are available
-next_hour_predictions_ready = \
-    False if predictions_df[predictions_df.pickup_hour == _current_date].empty else True
-prev_hour_predictions_ready = \
-    False if predictions_df[predictions_df.pickup_hour == (_current_date - timedelta(hours=1))].empty else True
+#next_hour_predictions_ready = \
+    #False if predictions_df[predictions_df.pickup_hour == _current_date].empty else True
+#prev_hour_predictions_ready = \
+    #False if predictions_df[predictions_df.pickup_hour == (_current_date - timedelta(hours=1))].empty else True
 
-if next_hour_predictions_ready:
+#if next_hour_predictions_ready:
     # predictions for the current hour are available
-    predictions_df = predictions_df[predictions_df.pickup_hour == _current_date]
-elif prev_hour_predictions_ready:
+#    predictions_df = predictions_df[predictions_df.pickup_hour == _current_date]
+#elif prev_hour_predictions_ready:
     # predictions for current hour are not available, so we use previous hour predictions
-    predictions_df = predictions_df[predictions_df.pickup_hour == (_current_date - timedelta(hours=1))]
-    _current_date = _current_date - timedelta(hours=1)
-    st.subheader('⚠️ The most recent data is not yet available. Using last hour predictions')
-else:
-    print(_current_date)
-    raise Exception('Features are not available for the last 2 hours. Is your feature \
-                    pipeline up and running? 🤔')
+#    predictions_df = predictions_df[predictions_df.pickup_hour == (_current_date - timedelta(hours=1))]
+#    st.subheader('⚠️ The most recent data is not yet available. Using last hour predictions')
+#else:
+#    print(_current_date)
+#    raise Exception('Features are not available for the last 2 hours. Is your feature \
+#                    pipeline up and running? 🤔')
 
 
 with st.spinner(text="Preparing data to plot"):
@@ -196,7 +194,7 @@ with st.spinner(text="Generating NYC Map"):
 
 
 with st.spinner(text="Fetching batch of features used in the last run"):
-    features_df = _load_batch_of_features_from_store(current_date)
+    features_df = _load_batch_of_features_from_store(_current_date)
     st.sidebar.write('✅ Inference features fetched from the store')
     progress_bar.progress(5/N_STEPS)
 
